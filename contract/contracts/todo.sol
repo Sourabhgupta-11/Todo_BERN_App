@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.2 <0.9.0;
 
-contract Todo {
-    address public owner;
-
+contract TodoApp {
     struct Task {
         uint id;
         string name;
@@ -12,84 +10,59 @@ contract Todo {
         bool exists;
     }
 
-    uint public taskId = 1;
-    mapping(uint => Task) private tasks;
+    mapping(address => mapping(uint => Task)) private tasks;
+    mapping(address => uint) private taskCount;  //its values are 0 by default
 
     // ---------------- MODIFIERS ----------------
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not owner");
-        _;
-    }
-
     modifier validTask(uint id) {
-        require(id != 0 && id < taskId, "Invalid task id");
-        require(tasks[id].exists, "Task does not exist");
+        require(id != 0 && id <= taskCount[msg.sender], "Invalid task id");
+        require(tasks[msg.sender][id].exists, "Task does not exist");
         _;
-    }
-
-    // ---------------- CONSTRUCTOR ----------------
-
-    constructor() {
-        owner = msg.sender;
     }
 
     // ---------------- TASK FUNCTIONS ----------------
 
-    function createTask(
-        string calldata name,
-        string calldata date
-    ) public onlyOwner {
-        tasks[taskId] = Task(
-            taskId,
+    function createTask(string calldata name, string calldata date) public {
+        uint id = taskCount[msg.sender] + 1;
+
+        tasks[msg.sender][id] = Task(
+            id,
             name,
             date,
-            false, 
-            true   
+            false,
+            true
         );
-        taskId++;
+
+        taskCount[msg.sender] = id;
     }
 
-    function updateTask(
-        uint _taskId,
-        string calldata name,
-        string calldata date
-    ) public onlyOwner validTask(_taskId) {
-        Task storage t = tasks[_taskId];
+    function updateTask(uint _taskId,string calldata name,string calldata date) public validTask(_taskId) {
+        Task storage t = tasks[msg.sender][_taskId];
         t.name = name;
         t.date = date;
     }
 
-    function toggleCompleted(uint _taskId)
-        public
-        onlyOwner
-        validTask(_taskId)
-    {
-        tasks[_taskId].completed = !tasks[_taskId].completed;
+    function toggleCompleted(uint _taskId) public validTask(_taskId) {
+        tasks[msg.sender][_taskId].completed =
+            !tasks[msg.sender][_taskId].completed;
     }
 
-    function viewTask(uint _taskId)
-        public
-        view
-        validTask(_taskId)
-        returns (Task memory)
-    {
-        return tasks[_taskId];
+    function deleteTask(uint _taskId) public validTask(_taskId) {
+        tasks[msg.sender][_taskId].exists = false;
     }
 
-    function deleteTask(uint _taskId)
-        public
-        onlyOwner
-        validTask(_taskId)
-    {
-        tasks[_taskId].exists = false;
+    function viewTask(uint _taskId)public view validTask(_taskId) returns (Task memory){
+        return tasks[msg.sender][_taskId];
     }
 
     function allTasks() public view returns (Task[] memory) {
+        uint total = taskCount[msg.sender];
         uint count = 0;
 
-        for (uint i = 1; i < taskId; i++) {
-            if (tasks[i].exists) {
+        // count existing tasks
+        for (uint i = 1; i <= total; i++) {
+            if (tasks[msg.sender][i].exists) {
                 count++;
             }
         }
@@ -97,9 +70,9 @@ contract Todo {
         Task[] memory list = new Task[](count);
         uint index = 0;
 
-        for (uint i = 1; i < taskId; i++) {
-            if (tasks[i].exists) {
-                list[index] = tasks[i];
+        for (uint i = 1; i <= total; i++) {
+            if (tasks[msg.sender][i].exists) {
+                list[index] = tasks[msg.sender][i];
                 index++;
             }
         }
