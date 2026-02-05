@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-12519e6b916edd3331d930b8066de79c3f6e7e0c",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/todo.sol": "project/contracts/todo.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/todo.sol": {
+        "content": "// SPDX-License-Identifier: UNLICENSED\r\npragma solidity >=0.8.2 <0.9.0;\r\n\r\ncontract TodoApp {\r\n    struct Task {\r\n        uint id;\r\n        string name;\r\n        string date;\r\n        bool completed;\r\n        bool exists;\r\n    }\r\n\r\n    mapping(address => mapping(uint => Task)) private tasks;\r\n    mapping(address => uint) private taskCount;  //its values are 0 by default\r\n\r\n    // ---------------- MODIFIERS ----------------\r\n\r\n    modifier validTask(uint id) {\r\n        require(id != 0 && id <= taskCount[msg.sender], \"Invalid task id\");\r\n        require(tasks[msg.sender][id].exists, \"Task does not exist\");\r\n        _;\r\n    }\r\n\r\n    // ---------------- TASK FUNCTIONS ----------------\r\n\r\n    function createTask(string calldata name, string calldata date) public {\r\n        uint id = taskCount[msg.sender] + 1;\r\n\r\n        tasks[msg.sender][id] = Task(\r\n            id,\r\n            name,\r\n            date,\r\n            false,\r\n            true\r\n        );\r\n\r\n        taskCount[msg.sender] = id;\r\n    }\r\n\r\n    function updateTask(uint _taskId,string calldata name,string calldata date) public validTask(_taskId) {\r\n        Task storage t = tasks[msg.sender][_taskId];\r\n        t.name = name;\r\n        t.date = date;\r\n    }\r\n\r\n    function toggleCompleted(uint _taskId) public validTask(_taskId) {\r\n        tasks[msg.sender][_taskId].completed =\r\n            !tasks[msg.sender][_taskId].completed;\r\n    }\r\n\r\n    function deleteTask(uint _taskId) public validTask(_taskId) {\r\n        tasks[msg.sender][_taskId].exists = false;\r\n    }\r\n\r\n    function viewTask(address user, uint _taskId)public view returns (Task memory){\r\n        require(_taskId != 0 && _taskId <= taskCount[user], \"Invalid task id\");\r\n        require(tasks[user][_taskId].exists, \"Task does not exist\");\r\n        return tasks[user][_taskId];\r\n    }\r\n\r\n    function allTasks(address user)public view returns (Task[] memory){\r\n        uint total = taskCount[user];\r\n        uint count = 0;\r\n\r\n        for (uint i = 1; i <= total; i++) {\r\n            if (tasks[user][i].exists) count++;\r\n        }\r\n\r\n        Task[] memory list = new Task[](count);\r\n        uint index = 0;\r\n\r\n        for (uint i = 1; i <= total; i++) {\r\n            if (tasks[user][i].exists) {\r\n                list[index++] = tasks[user][i];\r\n            }\r\n        }\r\n\r\n        return list;\r\n    }\r\n\r\n}\r\n"
+      }
+    }
+  }
+}

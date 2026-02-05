@@ -52,31 +52,30 @@ contract TodoApp {
         tasks[msg.sender][_taskId].exists = false;
     }
 
-    function viewTask(uint _taskId)public view validTask(_taskId) returns (Task memory){
-        return tasks[msg.sender][_taskId];
+    function viewTask(address user, uint _taskId)public view returns (Task memory){
+        require(_taskId != 0 && _taskId <= taskCount[user], "Invalid task id");
+        require(tasks[user][_taskId].exists, "Task does not exist");
+        return tasks[user][_taskId];
     }
 
-    function allTasks() public view returns (Task[] memory) {
-        uint total = taskCount[msg.sender];
+    function allTasks(address user)public view returns (Task[] memory){
+        uint total = taskCount[user];
         uint count = 0;
 
-        // count existing tasks
         for (uint i = 1; i <= total; i++) {
-            if (tasks[msg.sender][i].exists) {
-                count++;
-            }
+            if (tasks[user][i].exists) count++;
         }
 
         Task[] memory list = new Task[](count);
         uint index = 0;
 
         for (uint i = 1; i <= total; i++) {
-            if (tasks[msg.sender][i].exists) {
-                list[index] = tasks[msg.sender][i];
-                index++;
+            if (tasks[user][i].exists) {
+                list[index++] = tasks[user][i];
             }
         }
 
         return list;
     }
+
 }
