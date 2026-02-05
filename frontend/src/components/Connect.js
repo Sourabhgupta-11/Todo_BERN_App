@@ -7,7 +7,8 @@ const Connect = () => {
     try {
         if(window.ethereum){
             const account=await window.ethereum.request({method:'eth_requestAccounts'});
-            navigateTo("/home",{state:{address:account[0]}})
+            localStorage.setItem("walletAddress", account[0]);
+            navigateTo("/home");
         }
         else{
             alert("Install Metamask")
