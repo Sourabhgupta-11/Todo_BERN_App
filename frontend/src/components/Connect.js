@@ -18,14 +18,16 @@ const Connect = () => {
 }
 
   return (
-    <div className="card">
-  <h1>Connect Wallet</h1>
-  <p>Please connect your MetaMask wallet to continue.</p>
+    <div className="page">
+      <div className="card">
+        <h1>Connect Wallet</h1>
+        <p>Please connect your MetaMask wallet to continue.</p>
 
-  <button className="btn" onClick={connectWallet}>
-    Connect Wallet
-  </button>
-</div>
+        <button onClick={connectWallet}>
+          Connect Wallet
+        </button>
+      </div>
+    </div>
 
   )
 }
