@@ -44,6 +44,7 @@ const ViewTasks = () => {
 
   useEffect(() => {
     fetchTasks();
+    // eslint-disable-next-line
   }, [address]);
 
   // ---------------- TOGGLE COMPLETED ----------------
