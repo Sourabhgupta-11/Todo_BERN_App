@@ -1,67 +1,159 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 const Home = () => {
-   const address = localStorage.getItem("walletAddress");
+  const address = localStorage.getItem("walletAddress");
+
+  const [total, setTotal] = useState(0);
+  const [completed, setCompleted] = useState(0);
+  const [remaining, setRemaining] = useState(0);
+  const [thisWeek, setThisWeek] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // -------- FETCH TASKS & COMPUTE STATS --------
+  const fetchStats = useCallback(async () => {
+    if (!address) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/ethereum/view-allTask/${address}`
+      );
+
+      const data = await res.json();
+      if (!res.ok) throw new Error("Failed");
+
+      const tasks = data.Tasks || [];
+
+      const totalTasks = tasks.length;
+      const completedTasks = tasks.filter(t => t.completed).length;
+      const remainingTasks = totalTasks - completedTasks;
+
+      // ---- tasks this week ----
+      const now = new Date();
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 7);
+
+      const tasksThisWeek = tasks.filter(t => {
+        const taskDate = new Date(t.date);
+        return taskDate >= startOfWeek && taskDate < endOfWeek;
+      }).length;
+
+      setTotal(totalTasks);
+      setCompleted(completedTasks);
+      setRemaining(remainingTasks);
+      setThisWeek(tasksThisWeek);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [address]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   return (
     <div className="page">
-      <div className="card">
+      <div className="card" style={{ maxWidth: "600px" }}>
         <h2>Welcome to Todo DApp 🚀</h2>
 
         <p>
-          A decentralized task manager where your tasks are stored securely on
-          the Ethereum blockchain.
+          Manage your blockchain-secured tasks and track your progress.
         </p>
-
-        <div
+<div
+          className="task"
           style={{
-            margin: "18px 0",
-            padding: "12px",
-            borderRadius: "10px",
-            background: "rgba(15, 23, 42, 0.85)",
-            border: "1px solid rgba(255,255,255,0.08)",
+            textAlign: "center",
+            marginTop: "14px",
+            background: "rgba(15, 23, 42, 0.9)",
           }}
         >
-          <p style={{ marginBottom: "6px", fontSize: "0.9rem" }}>
+          <p style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
             Connected Wallet
           </p>
           <p
             style={{
+              fontSize: "1rem",
               fontWeight: "600",
               color: "#38bdf8",
-              fontSize: "0.95rem",
+              wordBreak: "break-all",
             }}
           >
             {address}
           </p>
         </div>
-
-        {/* Stats section (future-ready) */}
+        {/* -------- STATS GRID -------- */}
         <div
           style={{
-            display: "flex",
-            gap: "12px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "14px",
             marginTop: "20px",
           }}
         >
-          <div className="task" style={{ flex: 1, textAlign: "center" }}>
+          <div className="task" style={{ textAlign: "center" }}>
             <p style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
               Total Tasks
             </p>
-            <p style={{ fontSize: "1.2rem", fontWeight: "600" }}>—</p>
+            <p style={{ fontSize: "1.3rem", fontWeight: "600" }}>
+              {loading ? "—" : total}
+            </p>
           </div>
 
-          <div className="task" style={{ flex: 1, textAlign: "center" }}>
+          <div className="task" style={{ textAlign: "center" }}>
             <p style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
               Completed
             </p>
-            <p style={{ fontSize: "1.2rem", fontWeight: "600" }}>—</p>
+            <p
+              style={{
+                fontSize: "1.3rem",
+                fontWeight: "600",
+                color: "#22c55e",
+              }}
+            >
+              {loading ? "—" : completed}
+            </p>
+          </div>
+
+          <div className="task" style={{ textAlign: "center" }}>
+            <p style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
+              Remaining
+            </p>
+            <p
+              style={{
+                fontSize: "1.3rem",
+                fontWeight: "600",
+                color: "#facc15",
+              }}
+            >
+              {loading ? "—" : remaining}
+            </p>
+          </div>
+
+          <div className="task" style={{ textAlign: "center" }}>
+            <p style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
+              Tasks This Week
+            </p>
+            <p
+              style={{
+                fontSize: "1.3rem",
+                fontWeight: "600",
+                color: "#38bdf8",
+              }}
+            >
+              {loading ? "—" : thisWeek}
+            </p>
           </div>
         </div>
 
         <p style={{ marginTop: "22px", fontSize: "0.9rem" }}>
-          Use the navigation bar above to create, view, update, or delete your
-          tasks. Each action requires MetaMask confirmation.
+          Use the navigation bar to manage your tasks. All changes are stored
+          securely on the blockchain.
         </p>
       </div>
     </div>
