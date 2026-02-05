@@ -5,4 +5,3 @@ export default buildModule("TodoModule", (m) => {
   return { todoContract };
 });
 
-//0xc27bE5Ea8f0D35A1Ab5cb2594c3FF97a05CcA904
