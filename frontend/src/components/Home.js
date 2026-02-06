@@ -11,11 +11,12 @@ const Home = () => {
 
   // -------- FETCH TASKS & COMPUTE STATS --------
   const fetchStats = useCallback(async () => {
+    const BACKEND_API=process.env.REACT_APP_BACKEND_API;
     if (!address) return;
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/ethereum/view-allTask/${address}`
+        `${BACKEND_API}/view-allTask/${address}`
       );
 
       const data = await res.json();

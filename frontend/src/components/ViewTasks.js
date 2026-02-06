@@ -3,7 +3,6 @@ import { ethers } from "ethers";
 import TodoABI from "../TodoApp.json";
 
 const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS;
-const BACKEND_API=process.env.REACT_APP_BACKEND_API;
 
 const ViewTasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -16,6 +15,7 @@ const ViewTasks = () => {
 
   // ---------------- FETCH TASKS ----------------
   const fetchTasks = async () => {
+    const BACKEND_API=process.env.REACT_APP_BACKEND_API;
     if (!address) {
       setError("Wallet not connected");
       setLoading(false);

@@ -3,7 +3,6 @@ import { ethers } from "ethers";
 import TodoABI from "../TodoApp.json";
 
 const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS;
-const BACKEND_API=process.env.REACT_APP_BACKEND_API;
 
 const DeleteTask = () => {
   const [taskId, setTaskId] = useState("");
@@ -16,6 +15,8 @@ const DeleteTask = () => {
 
   // ---------------- FETCH TASK (CONFIRM) ----------------
   const fetchTask = async () => {
+    const BACKEND_API=process.env.REACT_APP_BACKEND_API;
+    
     if (!taskId) {
       setError("Please enter task ID");
       return;
