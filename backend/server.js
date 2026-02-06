@@ -2,7 +2,7 @@ require("dotenv/config")
 const express=require("express");
 const cors=require( "cors")
 const ethers=require("ethers")
-const Abi=require( "../contract/artifacts/contracts/todo.sol/TodoApp.json" )
+const Abi=require( "../backend/TodoApp.json" )
 
 const app=express();
 app.use(express.json());
