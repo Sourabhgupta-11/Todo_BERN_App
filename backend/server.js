@@ -6,7 +6,7 @@ const Abi=require( "../backend/TodoApp.json" )
 
 const app=express();
 app.use(express.json());
-app.use(cors({ origin: "https://todo-bern-app.vercel.app/" }));
+app.use(cors({ origin: "https://todo-bern-app.vercel.app" }));
 
 
 const contractAddress = "0xD7dee32c7abFAF3c52F5E71b4c7a5371E055e32f";
