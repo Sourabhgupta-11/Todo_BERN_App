@@ -6,7 +6,7 @@ const Abi=require( "../contract/artifacts/contracts/todo.sol/TodoApp.json" )
 
 const app=express();
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: process.env.FRONTEND_API }));
 
 
 const contractAddress = "0xD7dee32c7abFAF3c52F5E71b4c7a5371E055e32f";

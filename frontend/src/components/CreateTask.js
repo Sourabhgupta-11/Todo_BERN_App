@@ -7,7 +7,7 @@ const CreateTask = () => {
     const [date, setDate] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const CONTRACT_ADDRESS = "0xD7dee32c7abFAF3c52F5E71b4c7a5371E055e32f";
+    const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS;
 
     const handleCreateTask = async () => {
     if (!name || !date) {

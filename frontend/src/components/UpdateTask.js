@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import TodoABI from "../TodoApp.json";
 
 const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS;
+const BACKEND_API=process.env.REACT_APP_BACKEND_API;
 
 const UpdateTask = () => {
   const [taskId, setTaskId] = useState("");
@@ -26,7 +27,7 @@ const UpdateTask = () => {
       setError("");
 
       const res = await fetch(
-        `http://localhost:5000/api/ethereum/view-task/${address}/${taskId}`
+        `${BACKEND_API}/view-task/${address}/${taskId}`
       );
 
       const data = await res.json();

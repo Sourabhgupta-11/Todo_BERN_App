@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import TodoABI from "../TodoApp.json";
 
-const CONTRACT_ADDRESS = "0xD7dee32c7abFAF3c52F5E71b4c7a5371E055e32f";
+const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS;
+const BACKEND_API=process.env.REACT_APP_BACKEND_API;
 
 const ViewTasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -23,7 +24,7 @@ const ViewTasks = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/ethereum/view-allTask/${address}`
+        `${BACKEND_API}/view-allTask/${address}`
       );
 
       const data = await res.json();
